@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
 router.post('/register', async (req, res) => {
     const { name, email, password, cpassword, userType } = req.body
     if (!name || !email || !password || !cpassword) {
-        return res.status(422).json({ error: "Kindly fill all fields" })
+        return res.status(422).json({ err: "Kindly fill all fields" })
     }
     try {
         const userExist = await User.findOne({ email: email })
@@ -36,7 +36,6 @@ router.post('/register', async (req, res) => {
     } catch (err) {
         console.log(err)
     }
-
 
 })
 
@@ -93,6 +92,11 @@ router.get('/varify', authenticate, (req, res) => {
     res.send(req.userData)
 })
 
+router.get("/logout", (req, res)=>{
+    res.clearCookie("jwtoken",{path:"/"})
+    res.send("Logout")
+})
+
 router.put("/addProduct/:_id", async (req, res) => {
     try {
         const get = await User.find(req.params)
@@ -119,8 +123,7 @@ router.put("/addProduct/:_id", async (req, res) => {
 
 // get data form db;
 router.get('/data', async(req, res) =>{
-    console.log("yes")
-    let dbproducts = await User.findOne({"_id":process.env.ID})
+    let dbproducts = await User.findOne({"_id":process.env.ID}).lean()
     res.send(dbproducts.products)
 
 })
